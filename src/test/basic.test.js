@@ -1,64 +1,64 @@
 // @flow
-import React, { Component } from 'react'
-import { shallow, mount } from 'enzyme'
+import React,{ Component } from 'react'
+import{ shallow, mount } from 'enzyme'
 
-import { resetStyled, expectCSSMatches } from './utils'
+import{ resetStyled, expectCSSMatches } from './utils'
 
 let styled
 
-describe('basic', () => {
+describe('basic', () =>{
   /**
    * Make sure the setup is the same for every test
    */
-  beforeEach(() => {
+  beforeEach(() =>{
     styled = resetStyled()
   })
 
-  it('should not throw an error when called', () => {
+  it('should not throw an error when called', () =>{
     styled.div``
   })
 
-  it('should throw a meaningful error when called with null', () => {
+  it('should throw a meaningful error when called with null', () =>{
     const invalidComps = [undefined, null, 123, []]
-    invalidComps.forEach(comp => {
-      expect(() => {
+    invalidComps.forEach(comp =>{
+      expect(() =>{
         // $FlowInvalidInputTest
         const Comp = styled(comp)
         shallow(<Comp />)
         // $FlowInvalidInputTest
-      }).toThrow(`Cannot create styled-component for component: ${comp}`)
+      }).toThrow(`Cannot create styled-component for component:${comp}`)
     })
   })
 
-  it('should not inject anything by default', () => {
+  it('should not inject anything by default', () =>{
     styled.div``
     expectCSSMatches('')
   })
 
-  it('should inject component class when rendered even if no styles are passed', () => {
+  it('should inject component class when rendered even if no styles are passed', () =>{
     const Comp = styled.div``
     shallow(<Comp />)
-    expectCSSMatches('.sc-a {}')
+    expectCSSMatches('.sc-a{ }')
   })
 
-  it('should inject styles', () => {
+  it('should inject styles', () =>{
     const Comp = styled.div`
-      color: blue;
+      color:blue;
     `
     shallow(<Comp />)
-    expectCSSMatches('.sc-a { } .b { color: blue; }')
+    expectCSSMatches('.sc-a{ } .b{ color:blue; }')
   })
 
-  it('should inject only once for a styled component, no matter how often it\'s mounted', () => {
+  it('should inject only once for a styled component, no matter how often it\'s mounted', () =>{
     const Comp = styled.div`
-      color: blue;
+      color:blue;
     `
     shallow(<Comp />)
     shallow(<Comp />)
-    expectCSSMatches('.sc-a {} .b { color: blue; }')
+    expectCSSMatches('.sc-a{ } .b{ color:blue; }')
   })
 
-  it('Should have the correct styled(component) displayName', () => {
+  it('Should have the correct styled(component) displayName', () =>{
     const CompWithoutName = () => () => <div />
 
     const StyledTag = styled.div``
@@ -85,15 +85,15 @@ describe('basic', () => {
     expect(StyledCompWithNothing.displayName).toBe('Styled(Component)')
   })
 
-  describe('jsdom tests', () => {
-    it('should pass the ref to the component', () => {
+  describe('jsdom tests', () =>{
+    it('should pass the ref to the component', () =>{
       const Comp = styled.div``
 
-      class Wrapper extends Component {
-        testRef: any;
-        innerRef = (comp) => { this.testRef = comp }
+      class Wrapper extends Component{
+        testRef:any;
+        innerRef = (comp) =>{ this.testRef = comp }
 
-        render() {
+        render(){
           return <Comp innerRef={this.innerRef} />
         }
       }
@@ -106,20 +106,20 @@ describe('basic', () => {
       expect(component.find('div').prop('innerRef')).toBeFalsy()
     })
 
-    class InnerComponent extends Component {
-      render() {
+    class InnerComponent extends Component{
+      render(){
         return null
       }
     }
 
-    it('should not leak the innerRef prop to the wrapped child', () => {
+    it('should not leak the innerRef prop to the wrapped child', () =>{
       const OuterComponent = styled(InnerComponent)``
 
-      class Wrapper extends Component {
-        testRef: any;
+      class Wrapper extends Component{
+        testRef:any;
 
-        render() {
-          return <OuterComponent innerRef={(comp) => { this.testRef = comp }} />
+        render(){
+          return <OuterComponent innerRef={(comp) =>{ this.testRef = comp }} />
         }
       }
 
@@ -131,11 +131,11 @@ describe('basic', () => {
       expect(innerComponent.prop('innerRef')).toBeFalsy()
     })
 
-    it('should pass the full className to the wrapped child', () => {
+    it('should pass the full className to the wrapped child', () =>{
       const OuterComponent = styled(InnerComponent)``
 
-      class Wrapper extends Component {
-        render() {
+      class Wrapper extends Component{
+        render(){
           return <OuterComponent className="test"/>
         }
       }
@@ -145,15 +145,15 @@ describe('basic', () => {
         .toBe('test sc-a b')
     })
 
-    it('should pass the innerRef to the wrapped styled component', () => {
+    it('should pass the innerRef to the wrapped styled component', () =>{
       const InnerComponent = styled.div``
       const OuterComponent = styled(InnerComponent)``
 
-      class Wrapper extends Component {
-        testRef: any;
-        innerRef = (comp) => { this.testRef = comp }
+      class Wrapper extends Component{
+        testRef:any;
+        innerRef = (comp) =>{ this.testRef = comp }
 
-        render() {
+        render(){
           return <OuterComponent innerRef={this.innerRef} />
         }
       }
@@ -169,15 +169,15 @@ describe('basic', () => {
       expect(innerComponent.prop('innerRef')).toBe(wrapper.node.innerRef)
     })
 
-    it('should respect the order of StyledComponent creation for CSS ordering', () => {
-      const FirstComponent = styled.div`color: red;`
-      const SecondComponent = styled.div`color: blue;`
+    it('should respect the order of StyledComponent creation for CSS ordering', () =>{
+      const FirstComponent = styled.div`color:red;`
+      const SecondComponent = styled.div`color:blue;`
 
-      // NOTE: We're mounting second before first and check if we're breaking their order
+      // NOTE:We're mounting second before first and check if we're breaking their order
       shallow(<SecondComponent />)
       shallow(<FirstComponent />)
 
-      expectCSSMatches('.sc-a {} .d { color: red; } .sc-b {} .c { color: blue; }')
+      expectCSSMatches('.sc-a{ } .d{ color:red; } .sc-b{ } .c{ color:blue; }')
     })
   })
 })

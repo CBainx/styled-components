@@ -5,9 +5,9 @@ import type { Interpolation } from '../types'
 stylis.set({
   global: false,
   cascade: false,
-  keyframe: true,
+  keyframe: false,
   prefix: true,
-  compress: false,
+  compress: true,
   semicolon: true,
 })
 
